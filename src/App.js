@@ -14,18 +14,62 @@ const initialExpenses = [
 console.log(initialExpenses);
 
 function App() {
-
   // *********************** state values *****************
   // all expenses, add expenses
   const [expenses, setExpenses] = useState(initialExpenses);
+  // single expense
+  const [charge, setCharge] = useState("");
+  // single Amount
+  const [amount, setAmount] = useState("");
+  // alert
+  const [alert, setAlert] = useState({show: false})
+  // *********************** functionality *****************
+  //handle input changes
+  const handleChange = (e) => {
+    if (e.target.name === "charge") {
+      setCharge(e.target.value);
+    }
+    if (e.target.name === "amount") {
+      console.log(e.target.value);
+      setAmount(e.target.value);
+    }
+  };
 
-    // *********************** functionality *****************
+  // handle Alert 
+  const handleAlert = ({type, text}) => {
+    setAlert({show: true, type, text})
+    setTimeout(() => {
+      setAlert({show:false})
+    },3000)
+  }
+  // handle submit
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (parseInt(amount) > 0 && charge !== "") {
+      setExpenses([
+        ...expenses,
+        { id: uuid(), charge, amount: parseInt(amount) },
+      ]);
+      handleAlert({type:'success', text: 'item added.'})
+      setCharge("");
+      setAmount("");
+    } else {
+      handleAlert({type: 'danger', text: `charge can't be empty value and 
+      amount value has to be bigger than zero`})
+    }
+  };
+
   return (
     <div>
-      <Alert />
+      {alert.show && <Alert type={alert.type} text={alert.text}/>}
       <h1>Budget calculator</h1>
       <main className="App">
-        <ExpenseForm />
+        <ExpenseForm
+          amount={amount}
+          charge={charge}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+        />
         <ExpenseList expenses={expenses} />
       </main>
       <h1>
